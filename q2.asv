@@ -44,7 +44,7 @@ b1 = -q/Omega+4/3*mu*a0/    (1+1/(2*mu^2));
 %% plot blades
 
 circP = 30;
-radP = 40;
+radP = 10;
 
 psi = [0:pi/circP:2*pi]';
 beta = a0 - a1*cos(psi)-b1*sin(psi);
@@ -53,31 +53,21 @@ z = tan(beta)*r;
 x = sin(psi)*r;
 y = -cos(psi)*r;
 
-
+hold on
 
 xlabel("X");
 ylabel("Y");
 zlabel("Z");
-%surf(x,y,z)
+surf(x,y,z)
 
 
-%% 
 
+beta_dot = psi*a1*sin(psi) - psi*b1*cos(psi);
 
-beta_dot = Omega*(a1*sin(psi) - b1*cos(psi));
 alpha = theta - v_i./r/Omega- beta_dot/Omega + q/Omega*cos(psi);
+surf(x,y,z)
 
-
-y = sin(psi)*r  %x, y switched for view
-x = -cos(psi)*r;
-
-xlabel("Xdsafadsf");
-ylabel("Y");
-zlabel("Z");
-contour(x,y,alpha,23);
-
-
-% view(0,90)
+            
 % %make hub plane
 % r = 0:R/radP/2:R/2;
 % beta = alpha_c*cos(psi)-b1*sin(psi);
