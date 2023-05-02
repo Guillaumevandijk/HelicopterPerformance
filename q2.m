@@ -37,7 +37,7 @@ mu = V*cos(alpha_c)/(Omega*R);
 
 
 a0 = (gamma/8)*     (theta* (1+mu^2-  4/3*(lampda_i+lampda_c) )   );
-a1 = (-16/gamma*(q*pi/180)/Omega  +8/3*mu*theta-2*mu*(lampda_i+lampda_c))/       (1-1/(2*mu^2));
+a1 = (-16/gamma*(q)/Omega  +8/3*mu*theta-2*mu*(lampda_i+lampda_c))/       (1-1/(2*mu^2));
 b1 = -q/Omega+4/3*mu*a0/    (1+1/(2*mu^2));
 
 
