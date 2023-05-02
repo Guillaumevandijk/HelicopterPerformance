@@ -65,6 +65,8 @@ for i = 1:25
     V = sqrt(u^2+w^2);  
     %control plane angle
     alpha_c = theta_c - atan(w/u);
+
+    %HEEL GEVAARLIJK, ANDERS DAN ASSIGNMENT
     alpha_c = theta_c + atan(w/u); %Lijkt logischer toch?
     
     %w fraction
