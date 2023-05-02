@@ -123,25 +123,29 @@ for i = 1:25
         count = count+1;
     end
     
-    
+    %get thrust and drag
     T = CT_glau*rho*(Omega*R_tip)^2*pi*R_tip^2;
     D = Cd*1/2*rho*V^2*S;
     
+    %get derivatives
     u_dot = -9.81*sin(theta_f) - D*u/mass/V+T/mass*sin(theta_c-a_1) - q*w;
     w_dot = 9.81*cos(theta_f)- D*w/mass/V - T/mass*cos(theta_c-a_1) + q*u;
     q_dot = -T/I_y*h*sin(theta_c-a_1);
     theta_f_dot = q;
     
+    %get state variables
     u = u+u_dot*dt;
     w = w+w_dot*dt;
     q = q+q_dot*dt;
     theta_f = theta_f+ theta_f_dot*dt;
+
+    %count
     sim_count = sim_count+1;
     disp(sim_count);
 end
 
 
-
+%plot xy
 plot(x,y);
 
 
