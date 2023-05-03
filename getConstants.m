@@ -17,6 +17,7 @@ constantParam.gamma = 9;                  %[-] still needs to be determined
 %drag           still needs to be determined
 constantParam.Cd = 0;
 constantParam.S = 0;
+constantParam.S_eq = 3.1773; %[m^2]
 
 %get solidity
 constantParam.A_blades = (constantParam.R_tip)*constantParam.chord*4;
