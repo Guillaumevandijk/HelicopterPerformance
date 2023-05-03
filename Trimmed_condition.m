@@ -1,0 +1,49 @@
+function [Angles] = Trimmed_condition(constantParam)
+%This function finds the trimmed condition, cyclic and collective
+
+
+W = constantParam.mass*9.81;
+R = constantParam.R_tip;
+Omega = constantParam.Omega;
+blade_sol = constantParam.sigma;
+cl_alpha = constantParam.Cl_alpha;
+rho = constantParam.rho;
+A_fus = constantParam.S_eq;
+
+V_max = 100;
+dV = 0.1;
+
+V = 0:dV:V_max;
+Angles = zeros(2, length(V));
+syms Lambda_ik
+
+for k = 1:length(V)
+
+Drag_fus = 0.5 * rho * V(k)^2 * A_fus; %Uses equivalent flat plate area
+T = sqrt(W^2 + Drag_fus^2);
+alpha_d = Drag_fus/W;
+C_T = T/(rho * ((Omega*R)^2) * pi * R^2);
+
+C_T_glauert = C_T == 2 * Lambda_ik * sqrt((V(k)/(Omega*R)*(sin(alpha_d)) + Lambda_ik)^2 + (V(k)/(Omega*R)*(cos(alpha_d)))^2);
+solution = vpasolve(C_T_glauert, Lambda_ik);
+Lambda_i = max(solution(solution == real(solution)));
+mu = V(k)/(Omega*R);
+
+Mat1 = [1 + 3/2 * mu^2, -(8/3)*mu; -mu, (2/3) + mu^2];
+Mat2 = [-2 * (mu^2) * Drag_fus/W - (2 * mu * Lambda_i); 4/blade_sol * C_T / cl_alpha + mu * Drag_fus / W + Lambda_i];
+Angles(: , k) = linsolve (Mat1 ,Mat2) ./ pi .*180;
+end
+
+figure
+plot(V, Angles(1,:), 'DisplayName', 'Theta_c', LineWidth=1.5)
+hold on
+plot(V, Angles(2,:), 'DisplayName', 'Theta_0', LineWidth=1.5)
+legend('Interpreter','latex')
+grid
+title('Trim angles', 'Interpreter','latex')
+xlabel('velocity [m/s]')
+xlim([0 100])
+%xticks([-5 0 5 10])
+ylabel('Angle [deg]')
+
+end
