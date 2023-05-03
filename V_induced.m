@@ -9,7 +9,7 @@ A_fus = constantParam.S_eq;
 
 Vi_hover = sqrt(W/(2*rho*pi*(R^2)));
 
-V = 1:0.5:100;
+V = 1:2:100;
 
 v_i = zeros(1, length(V));
 
