@@ -28,19 +28,23 @@ sigma = A_blades/A_disc;
 
 %% start parameters for simulation
 %initial conditions
-V_x0 =      46.3;  
-theta_f0 =  -2   *pi/180;        %rad
+V_x0 =      46.3; 
+V_y0 =      0;
+theta_f0 =  0   *pi/180;        %rad
 q0 =        0   *pi/180;        %rad/s
 u0 =        cos(theta_f0)*V_x0;   %m/s
 w0 =        sin(theta_f0)*V_x0;   %m/s
 
 %control variables:
 theta_0 =   6   *pi/180;        %rad
-theta_c =   6   *pi/180;        %rad
+theta_c =   0   *pi/180;        %rad
 
 %tracking the heli start point
-x = [0];
-y = [0];
+x_track = 0;
+y_track = 0;
+V_x_track = V_x0;
+V_y_track = V_y0;
+time_track = 0;
 
 %timestep
 dt = 0.01;
@@ -56,19 +60,22 @@ q = q0;
 
 %starting simulation
 
-sim_count = 0;
-for i = 1:25
+time = 0;
+
+while time <1 
 
     
     
     %flight velocity
     V = sqrt(u^2+w^2);  
-    %control plane angle
-    alpha_c = theta_c - atan(w/u);
-
-    %HEEL GEVAARLIJK, ANDERS DAN ASSIGNMENT
-    alpha_c = theta_c + atan(w/u); %Lijkt logischer toch?
     
+    %control plane angle
+    if u >= 0
+        alpha_c = theta_c - atan(w/u);
+    else
+        alpha_c = theta_c + atan(w/u);
+    end
+
     %w fraction
     lampda_c = V*sin(alpha_c)/(Omega*R_tip);
     %u fraction
@@ -81,15 +88,7 @@ for i = 1:25
     lampda_i = 0;       %chosen
     count = 0;          %counting
     Flampda = 1;        %dummy to initiate while loop
-    
-    
-    %trakcing the heli progression 
-    V_x = cos(theta_f)*u+sin(theta_f)*w;
-    V_y = cos(theta_f)*w-sin(theta_f)*u;
-    x = [x x(end)+dt*V_x];
-    y = [y y(end)+dt*V_y];
-
-    
+   
     while abs(Flampda)>0.0001 && count<1000
         lampda_i_2 = lampda_i+0.0001;
         
@@ -122,7 +121,7 @@ for i = 1:25
     
         %xn+1 = x - alpha * f(x)/f'(x)
         lampda_i = lampda_i - alpha_newton* Flampda/Flampda_grad;
-        count = count+1;
+        count = count +1;
     end
     
     %get thrust and drag
@@ -142,13 +141,46 @@ for i = 1:25
     theta_f = theta_f+ theta_f_dot*dt;
 
     %count
-    sim_count = sim_count+1;
-    disp(sim_count);
+    time = time+dt;
+    disp(time);
+
+    %tracking the heli progression 
+    V_x = cos(-theta_f)*u-sin(-theta_f)*w;
+    V_y = -cos(-theta_f)*w-sin(-theta_f)*u;
+
+    x_track = [x_track x_track(end)+dt*V_x];
+    y_track = [y_track y_track(end)+dt*V_y];
+    V_x_track = [V_x_track V_x];
+    V_y_track = [V_y_track V_y];
+    time_track = [time_track time];
+
+
 end
 
 
 %plot xy
-plot(x,y);
+
+% Create a figure and subplot layout
+figure;
+subplot(2,1,1); 
+plot(x_track, -y_track);
+title('coordinates');
+xlabel('-X');
+ylabel('Y');
+
+subplot(2,1,2); 
+plot(V_x_track, time);
+title('Vx over time');
+xlabel('t');
+ylabel('Vx');
+
+plot(V_y_track, time);
+title('Vy over time');
+xlabel('t');
+ylabel('Vy');
+
+
+plot(-x_track,y_track);
 
 
 % Try to figure out gamma
