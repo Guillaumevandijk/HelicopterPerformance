@@ -1,53 +1,53 @@
 clear all 
 close all
 
+[constantParam] = getConstants();
 %Constants
 %flight conditions
-rho = 1.225;
-
-
+rho = constantParam.rho; %kg/m^2
 %Helicopter parameters
-mass =  8322.4;             %kg
-chord = 0.5273;             %m
-I_y = 87905.35;             %kgm^2  estimated
-Omega =  257.83   *2*pi/60; %rad/s
-R_tip = 8.1778;             %m
-Cl_alpha = 0.1176   *180/pi;%1/rad
-h = 2.4;                    %m, height from blades to cg
-gamma = 9;                  %[-] still needs to be determined
-
+mass = constantParam.mass;%kg
+chord= constantParam.chord;            %m
+I_y = constantParam.I_y;             %kgm^2  estimated
+Omega = constantParam.Omega; %rad/s
+R_tip = constantParam.R_tip;             %m
+Cl_alpha = constantParam.Cl_alpha;%1/rad
+h= constantParam.h;                    %m, height from blades to cg
+gamma = constantParam.gamma;                  %[-] still needs to be determined
 %drag           still needs to be determined
-Cd = 0;
-S = 0;
-
+Cd = constantParam.Cd;
+S = constantParam.S;
 %get solidity
-A_blades = (R_tip)*chord*4;
-A_disc = pi*R_tip^2;
-sigma = A_blades/A_disc;
+A_blades = constantParam.A_blades;
+A_disc = constantParam.A_disc;
+sigma = constantParam.sigma;
 
 
 %% start parameters for simulation
 %initial conditions
-V_x0 =      46.3; 
+V_x0 =      5; 
 V_y0 =      0;
-theta_f0 =  0   *pi/180;        %rad
+theta_f0 =  -10   *pi/180;        %rad
 q0 =        0   *pi/180;        %rad/s
 u0 =        cos(theta_f0)*V_x0;   %m/s
 w0 =        sin(theta_f0)*V_x0;   %m/s
 
 %control variables:
-theta_0 =   6   *pi/180;        %rad
-theta_c =   0   *pi/180;        %rad
+theta_0 =   10   *pi/180;        %rad
+theta_c =   2   *pi/180;        %rad
 
 %tracking the heli start point
 x_track = 0;
-y_track = 0;
+y_track = 100;
 V_x_track = V_x0;
 V_y_track = V_y0;
+u_track = u0;
+w_track = w0;
+theta_f_track = theta_f0;
 time_track = 0;
 
 %timestep
-dt = 0.01;
+dt = 0.001;
 
 %% Create the system
 
@@ -61,19 +61,18 @@ q = q0;
 %starting simulation
 
 time = 0;
-
-while time <1 
-
+disp(" alright");
+while time <3 
     
-    
+
     %flight velocity
     V = sqrt(u^2+w^2);  
     
     %control plane angle
     if u >= 0
-        alpha_c = theta_c - atan(w/u);
+        alpha_c = theta_c - theta_f;
     else
-        alpha_c = theta_c + atan(w/u);
+        alpha_c = theta_c + theta_f;
     end
 
     %w fraction
@@ -82,15 +81,15 @@ while time <1
     mu = V*cos(alpha_c)/(Omega*R_tip);
     
     %% Find lampda_i, induced velocity fraction
-    alpha_newton = 0.4; %newton raphson parameter
+    alpha_newton = 0.2; %newton raphson parameter
     
     %search start lampda
     lampda_i = 0;       %chosen
     count = 0;          %counting
     Flampda = 1;        %dummy to initiate while loop
    
-    while abs(Flampda)>0.0001 && count<1000
-        lampda_i_2 = lampda_i+0.0001;
+    while abs(Flampda)>0.000001 && count<1000
+        lampda_i_2 = lampda_i+0.0000001;
         
     
     
@@ -133,6 +132,31 @@ while time <1
     w_dot = 9.81*cos(theta_f)- D*w/mass/V - T/mass*cos(theta_c-a_1) + q*u;
     q_dot = -T/I_y*h*sin(theta_c-a_1);
     theta_f_dot = q;
+
+
+%     if time > 0.130
+% 
+%         mu
+%         q
+%         q_dot
+%         theta_0
+%         theta_c
+%         theta_f
+%         theta_f_dot
+%         u
+%         u_dot        
+%         alpha_c
+%         a_1
+%         lampda_c
+%         lampda_i
+%         w
+%         w_dot
+%         Vi_glau
+%         
+%     end
+
+
+
     
     %get state variables
     u = u+u_dot*dt;
@@ -142,7 +166,7 @@ while time <1
 
     %count
     time = time+dt;
-    disp(time);
+    %disp(time);
 
     %tracking the heli progression 
     V_x = cos(-theta_f)*u-sin(-theta_f)*w;
@@ -153,7 +177,11 @@ while time <1
     V_x_track = [V_x_track V_x];
     V_y_track = [V_y_track V_y];
     time_track = [time_track time];
+    u_track = [u_track u];
+    w_track = [w_track w];
+    theta_f_track = [theta_f_track theta_f];
 
+    %theta_c = theta_c -  0.000002*abs((V_x-30));
 
 end
 
@@ -161,26 +189,34 @@ end
 %plot xy
 
 % Create a figure and subplot layout
-figure;
-subplot(2,1,1); 
-plot(x_track, -y_track);
+figure(1);
+subplot(4,1,1); 
+plot(-x_track, y_track);
 title('coordinates');
 xlabel('-X');
-ylabel('Y');
+ylabel('Height');
+axis([-200,200,0,400]);
 
-subplot(2,1,2); 
-plot(V_x_track, time);
+
+subplot(4,1,2); 
+plot(time_track,V_x_track );
 title('Vx over time');
 xlabel('t');
 ylabel('Vx');
 
-plot(V_y_track, time);
+subplot(4,1,3); 
+plot(time_track,V_y_track);
 title('Vy over time');
 xlabel('t');
 ylabel('Vy');
 
+subplot(4,1,4); 
+plot(time_track,180/pi*theta_f_track);
+title('theta_f over time');
+xlabel('t');
+ylabel('theta_f');
 
-plot(-x_track,y_track);
+
 
 
 % Try to figure out gamma
