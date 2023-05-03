@@ -1,4 +1,4 @@
-function [power] = flight_power(constantParam)
+function [power, V_range, V_endurance] = flight_power(constantParam)
 %This function calculates the total required power in forward flight using
 %BEM
 [v_in, V] = V_induced(constantParam);
@@ -59,6 +59,9 @@ P_tot_all = P_tot_main + P_tot_tail;
 power(count) = P_tot_all;
 
 end
+powerV = power./V;
+V_range = V(powerV == min(powerV));
+V_endurance = V(power == min(power));
 
 figure
 %plot(V, v_i, 'DisplayName', 'Induced velocity', LineWidth=1.0)
@@ -70,4 +73,6 @@ title('Required total power in forward flight', 'Interpreter','latex')
 xlabel('Forward velocity [m/s]')
 %xlim([0 100])
 ylabel('Required power [W]')
+
+
 end
