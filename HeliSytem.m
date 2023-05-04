@@ -27,10 +27,12 @@ A_disc = constantParam.A_disc;
 sigma = constantParam.sigma;
 A_fus =constantParam.S_eq;
 
-
+%desired velocity
+%V_list = [36.01, 46.3, 56.59];
+V_list = [30, 40,50];
 %% start parameters for simulation
 %initial conditions
-V_x0 =      20; 
+V_x0 =      V_list(2); 
 V_y0 =      0;
 
 %get theta_f0 with drag
@@ -70,6 +72,7 @@ w = w0;
 theta_f = theta_f0;  
 q = q0;
 
+
 %desired velocity and hight
 V_xdes = V_x0;
 y_des = 100;
@@ -78,13 +81,21 @@ y_des = 100;
 
 %Controller parameters;
 
-Kp_0 = 1;
-Ki_0 = 0.000;
-Kd_0 = -0.002;
+% Kp_0 = 1;
+% Ki_0 = 0.000;
+% Kd_0 = -0.002;
+% 
+% Kp_c = 0.0000;
+% Ki_c = 0.000;
+% Kd_c = -0.01;
 
-Kp_c = 0.0000;
-Ki_c = 0.000;
-Kd_c = -0.01;
+Kp_0 = 1; 
+Ki_0 = 0.1;
+Kd_0 = -0.002; %negative
+
+Kp_c = 0;
+Ki_c = 0.00;
+Kd_c = -0.01; %negative
 
 
 
@@ -95,12 +106,24 @@ theta_c = theta_c_trim;
 int_0 = 0;
 int_c = 0;
 y = y_track;
-
-while time <40
-
+while time <183
 
     %flight velocity
     V = sqrt(u^2+w^2); 
+
+    if time > 20
+        V_xdes = V_list(1);
+        [theta_c_trim,theta_0_trim] = getTrim(V_xdes,Angles);
+    if time > 63
+        V_xdes = V_list(2);
+        [theta_c_trim,theta_0_trim] = getTrim(V_xdes,Angles);
+    if time > 123
+        V_xdes = V_list(3);  
+        [theta_c_trim,theta_0_trim] = getTrim(V_xdes,Angles);
+    end
+    end
+    end
+
     
     %update velocity and hight
     V_xold = cos(-theta_f)*u-sin(-theta_f)*w;
@@ -202,27 +225,38 @@ while time <40
 
 
     %start the controller aftet certain time
-    if time >3
-        
+        e_0 = -V_y;
+        e_c = V_xdes-V_x;
         %update integrals 
-        int_0 = int_0+dt*(y_des-y);
-        int_c = int_c+dt*(V_xdes-V_x);
-
+%         int_0 = int_0+dt*(y_des-y);
+%         int_c = int_c+dt*(V_xdes-V_x);
+        int_0 = int_0+dt*(e_0);
+        int_c = int_c+dt*(e_c);
         %calculate controller signals for collective
-        theta_0P = Kp_0*(y_des - y);
+%         theta_0P = Kp_0*(y_des - y);
+%         theta_0I = Ki_0*int_0;
+%         theta_0D = Kd_0*V_y/dt; 
+        theta_0P = Kp_0*(e_0);
         theta_0I = Ki_0*int_0;
-        theta_0D = Kd_0*V_y/dt; 
-
+        theta_0D = Kd_0*(V_y-V_yold)/dt; 
         %calculate controller signals for cyclic
-        theta_cP = Kp_c*(V_xdes-V_x);
+%         theta_cP = Kp_c*(V_xdes-V_x);
+%         theta_cI = Ki_c*int_c;
+%         theta_cD = Kd_c*(V_x-V_xold)/dt;
+        theta_cP = Kp_c*(e_c);
         theta_cI = Ki_c*int_c;
-        theta_cD = Kd_c*(V_x-V_xold)/dt;
+        theta_cD = Kd_c*(V_x-V_xold)/dt;        
     
         %add al signals and update collective and cyclic
         theta_0 = theta_0_trim + theta_0P + theta_0I + theta_0D;
         theta_c = theta_c_trim + theta_cP + theta_cI + theta_cD;
 
-    end
+        if theta_0 > 0.2
+            theta_0 = 20;
+        end
+        if theta_c > 0.2
+            theta_c = 20;
+        end
 
 end
 
@@ -231,9 +265,9 @@ end
 % Create a figure and subplot layout
 figure(1);
 subplot(6,1,1); 
-plot(-x_track, y_track);
+plot(x_track, y_track);
 title('coordinates');
-xlabel('-X');
+xlabel('X');
 ylabel('Height');
 % axis([-200,200,80,120]);
 
@@ -268,7 +302,7 @@ plot(time_track,180/pi*theta_c_track);
 title('theta_c over time');
 xlabel('t');
 ylabel('theta_c');
-axis([0,time,1.2,1.6]);
+%axis([0,time,1.2,1.6]);
 
 
 
