@@ -1,7 +1,12 @@
 clear all 
 close all
 
+
+
+
 [constantParam] = getConstants();
+%Trimmed_condition(constantParam);
+
 %Constants
 %flight conditions
 rho = constantParam.rho; %kg/m^2
@@ -21,20 +26,24 @@ S = constantParam.S;
 A_blades = constantParam.A_blades;
 A_disc = constantParam.A_disc;
 sigma = constantParam.sigma;
+A_fus =constantParam.S_eq;
 
 
 %% start parameters for simulation
 %initial conditions
-V_x0 =      5; 
+V_x0 =      0.01; 
 V_y0 =      0;
-theta_f0 =  -10   *pi/180;        %rad
+
+%get theta_f0 with drag
+D = 0.5 * rho * V_x0^2 * A_fus;
+theta_f0 = atan(-D/(mass*9.81))   *pi/180;        %rad
 q0 =        0   *pi/180;        %rad/s
 u0 =        cos(theta_f0)*V_x0;   %m/s
 w0 =        sin(theta_f0)*V_x0;   %m/s
 
 %control variables:
-theta_0 =   10   *pi/180;        %rad
-theta_c =   2   *pi/180;        %rad
+theta_0 =   8.94   *pi/180;        %rad
+theta_c =  1   *pi/180;        %rad
 
 %tracking the heli start point
 x_track = 0;
@@ -62,6 +71,8 @@ q = q0;
 
 time = 0;
 disp(" alright");
+check = true;
+sum = 0;
 while time <3 
     
 
@@ -81,17 +92,22 @@ while time <3
     mu = V*cos(alpha_c)/(Omega*R_tip);
     
     %% Find lampda_i, induced velocity fraction
-    alpha_newton = 0.2; %newton raphson parameter
+    alpha_newton = 0.05; %newton raphson parameter
     
     %search start lampda
     lampda_i = 0;       %chosen
     count = 0;          %counting
     Flampda = 1;        %dummy to initiate while loop
    
-    while abs(Flampda)>0.000001 && count<1000
+    
+
+    while abs(Flampda)>0.0001 && count<2000
         lampda_i_2 = lampda_i+0.0000001;
         
-    
+        if count>1999
+        disp(time);
+        
+        end
     
         %f(x)
         %obtain glauert thrust
@@ -119,13 +135,13 @@ while time <3
         Flampda_grad = (Flampda_2-Flampda)/(lampda_i_2-lampda_i);
     
         %xn+1 = x - alpha * f(x)/f'(x)
-        lampda_i = lampda_i - alpha_newton* Flampda/Flampda_grad;
+        lampda_i = lampda_i - alpha_newton* Flampda/2/Flampda_grad;
         count = count +1;
     end
     
     %get thrust and drag
     T = CT_glau*rho*(Omega*R_tip)^2*pi*R_tip^2;
-    D = Cd*1/2*rho*V^2*S;
+    D = 0.5 * rho * V^2 * A_fus; %Uses equivalent flat plate area
     
     %get derivatives
     u_dot = -9.81*sin(theta_f) - D*u/mass/V+T/mass*sin(theta_c-a_1) - q*w;
@@ -133,27 +149,8 @@ while time <3
     q_dot = -T/I_y*h*sin(theta_c-a_1);
     theta_f_dot = q;
 
+    
 
-%     if time > 0.130
-% 
-%         mu
-%         q
-%         q_dot
-%         theta_0
-%         theta_c
-%         theta_f
-%         theta_f_dot
-%         u
-%         u_dot        
-%         alpha_c
-%         a_1
-%         lampda_c
-%         lampda_i
-%         w
-%         w_dot
-%         Vi_glau
-%         
-%     end
 
 
 
@@ -184,7 +181,6 @@ while time <3
     %theta_c = theta_c -  0.000002*abs((V_x-30));
 
 end
-
 
 %plot xy
 
