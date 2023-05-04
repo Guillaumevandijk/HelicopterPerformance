@@ -90,12 +90,12 @@ y_des = 100;
 % Kd_c = -0.01;
 
 Kp_0 = 1; 
-Ki_0 = 0.1;
+Ki_0 = 50;
 Kd_0 = -0.002; %negative
 
-Kp_c = 0;
+Kp_c = 0.002;
 Ki_c = 0.00;
-Kd_c = -0.01; %negative
+Kd_c = -0.025; %negative
 
 
 
@@ -252,10 +252,10 @@ while time <183
         theta_c = theta_c_trim + theta_cP + theta_cI + theta_cD;
 
         if theta_0 > 0.2
-            theta_0 = 20;
+            theta_0 = 0.2;
         end
         if theta_c > 0.2
-            theta_c = 20;
+            theta_c = 0.2;
         end
 
 end
