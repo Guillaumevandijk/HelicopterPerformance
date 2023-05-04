@@ -116,7 +116,7 @@ while time <3
         V_glau = V/(Omega*R_tip)*cos(alpha_c-a_1);
         Vi_glau = V/(Omega*R_tip)*sin(alpha_c-a_1)+lampda_i;%glauert thrust
         CT_glau = 2*lampda_i*sqrt(V_glau^2+Vi_glau^2);%element thrust
-        CT_elem = 1/4*Cl_alpha*sigma*(2/3*theta_0*(1+3/2*mu^2)-(lampda_c - lampda_i));
+        CT_elem = 1/4*Cl_alpha*sigma*(2/3*theta_0*(1+3/2*mu^2)-(lampda_c + lampda_i));
         %match the two thrusts
         Flampda = CT_elem - CT_glau;
     
@@ -127,7 +127,7 @@ while time <3
         V_glau = V/(Omega*R_tip)*cos(alpha_c-a_1);
         Vi_glau = V/(Omega*R_tip)*sin(alpha_c-a_1)+lampda_i_2;
         CT_glau = 2*lampda_i_2*sqrt(V_glau^2+Vi_glau^2);%glauert thrust
-        CT_elem = 1/4*Cl_alpha*sigma*(2/3*theta_0*(1+3/2*mu^2)-(lampda_c - lampda_i_2));%element thrust
+        CT_elem = 1/4*Cl_alpha*sigma*(2/3*theta_0*(1+3/2*mu^2)-(lampda_c + lampda_i_2));%element thrust
         %match the two thrusts
         Flampda_2 = CT_elem - CT_glau;
     
