@@ -18,8 +18,6 @@ alpha_c = 2     *pi/180;
 alpha_cl= 1     *pi/180;
 
 
-
-
 %Hoover induced velocity
 T = mass*9.81/cos(alpha_c);
 vi_h = sqrt(T/(2*rho*R_tip^2));
