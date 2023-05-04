@@ -82,9 +82,9 @@ Kp_0 = 1;
 Ki_0 = 0.000;
 Kd_0 = -0.002;
 
-Kp_c = 0.001;
+Kp_c = 0.0000;
 Ki_c = 0.000;
-Kd_c = -0.005;
+Kd_c = -0.01;
 
 
 
@@ -216,7 +216,7 @@ while time <40
         %calculate controller signals for cyclic
         theta_cP = Kp_c*(V_xdes-V_x);
         theta_cI = Ki_c*int_c;
-        theta_cD = Kp_c*(V_x-V_xold)/dt;
+        theta_cD = Kd_c*(V_x-V_xold)/dt;
     
         %add al signals and update collective and cyclic
         theta_0 = theta_0_trim + theta_0P + theta_0I + theta_0D;
