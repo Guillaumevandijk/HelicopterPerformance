@@ -40,9 +40,9 @@ Angles = [V ; Angles*pi/180];
 
 
 figure
-plot(V, Angles(2,:), 'DisplayName', 'Theta_c', LineWidth=1.5)
+plot(V, Angles(2,:)/(pi/180), 'DisplayName', 'Theta_c', LineWidth=1.5)
 hold on
-plot(V, Angles(3,:), 'DisplayName', 'Theta_0', LineWidth=1.5)
+plot(V, Angles(3,:)/(pi/180), 'DisplayName', 'Theta_0', LineWidth=1.5)
 legend('Interpreter','latex')
 grid
 title('Trim angles', 'Interpreter','latex')

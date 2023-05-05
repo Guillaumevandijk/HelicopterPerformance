@@ -28,8 +28,8 @@ sigma = constantParam.sigma;
 A_fus =constantParam.S_eq;
 
 %desired velocity
-%V_list = [36.01, 46.3, 56.59];
-V_list = [30, 40,50];
+V_list = [36.01, 46.3, 56.59];
+%V_list = [30, 40,50];
 %% start parameters for simulation
 %initial conditions
 V_x0 =      V_list(2); 
@@ -263,8 +263,7 @@ end
 %plot xy
 
 % Create a figure and subplot layout
-figure(1);
-subplot(6,1,1); 
+figure()
 plot(x_track, y_track);
 title('coordinates');
 xlabel('X');
@@ -272,32 +271,31 @@ ylabel('Height');
 % axis([-200,200,80,120]);
 
 
-subplot(6,1,2); 
+figure()
 plot(time_track,V_x_track );
 title('Vx over time');
 xlabel('t');
 ylabel('Vx');
-
-subplot(6,1,3); 
+ 
+figure()
 plot(time_track,V_y_track);
 title('Vy over time');
 xlabel('t');
 ylabel('Vy');
 
-subplot(6,1,4); 
+figure()
 plot(time_track,180/pi*theta_f_track);
 title('theta_f over time');
 xlabel('t');
-ylabel('theta_f');
-subplot(6,1,5); 
+ylabel('theta_f'); 
 
+figure()
 plot(time_track,180/pi*theta_0_track);
 title('theta_0 over time');
 xlabel('t');
 ylabel('theta_0');
-subplot(6,1,6); 
 
-
+figure()
 plot(time_track,180/pi*theta_c_track);
 title('theta_c over time');
 xlabel('t');

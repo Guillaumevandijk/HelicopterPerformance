@@ -1,4 +1,4 @@
-function [v_i, V] = V_induced(constantParam)
+function [v_i, V, Vi_hover] = V_induced(constantParam)
 %This function calculates the induced velocity in hover and forward flight
 %using the Actuator Disc Theory
 
@@ -9,7 +9,7 @@ A_fus = constantParam.S_eq;
 
 Vi_hover = sqrt(W/(2*rho*pi*(R^2)));
 
-V = 1:2:100;
+V = 1:0.1:100;
 
 v_i = zeros(1, length(V));
 
